@@ -1,0 +1,6 @@
+pyyaml
+numpy
+pandas
+pyvisa
+paramiko
+openpyxl

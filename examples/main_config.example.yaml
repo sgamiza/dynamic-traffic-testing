@@ -1,0 +1,192 @@
+
+##################################################
+####    power sensor config
+##################################################
+POWER_SENSOR_IP1: '127.0.0.1'
+POWER_SENSOR_PROFILE1:
+    freq_ps: 3795    # center frequency
+    bandwidth_ps: 10 # bandwidth
+    loss_ps: 31.5     # correction offset
+    att_ps: 30.0       # input attenuation
+
+POWER_SENSOR_IP2: '127.0.0.1'
+POWER_SENSOR_PROFILE2:
+    freq_ps: 3415.02    # center frequency
+    bandwidth_ps: 10 # bandwidth
+    loss_ps: 31.5     # correction offset
+    att_ps: 30.0       # input attenuation
+
+
+##################################################
+####    BBU config
+##################################################
+BBU_IP: '127.0.0.1'
+UE_CELLULAR_IP: &ue_cellular_ip
+  - '127.0.0.1'
+  - '127.0.0.1'
+
+PCI:
+  - '271'
+  - '272'
+
+pMax: 40
+
+
+
+##################################################
+####    traffic config
+##################################################
+TRAFICC_PROFILE:
+    SERVER_IP:  '127.0.0.1'
+    IPERF_VERSION:  'V2'
+    TECHNOLOGY: '5GSA-TDD'  # 5GNSA-FDD , 5GNSA-TDD, 5GSA-FDD, 5GSA-TDD, LTE-FDD , LTE-TDD
+    CARRIER_BW: '10MHZ'  # 20MHZ , 15MHZ , 10MHZ, 5MHZ, 30MHZ , 40MHZ , 50MHZ , 100MHZ
+    MIMO: '4X4MIMO'  # 2X2MIMO , 4X4MIMO
+    MODULATION: '256QAM'  # 64QAM , 256QAM
+    RADIO: 'TEST_DUT'
+    LTE_BITRATE: 0  # 5GNSA only
+    UE_PORT: 50501   # iperf port
+    UE_IP: *ue_cellular_ip # do not change
+
+#    RUNTIME: 50  # HOURS
+    RUNTIME: 2  # HOURS
+    T_IDLE_BW_PROFILE: 3  # MINUTES
+    T_IDLE_BW_SEQ: 7  # MINUTES
+
+    # For profiles that don't want to be run, set 0 for those profiles in profile_running_time to disable.
+    PROFILE_RUNNING_TIME:  # profile_running_time:  Duration in minutes to run the profile.
+      'profile_idle': 25
+      'profile_50': 20
+      'profile_30': 20
+      'profile_70': 20
+      'profile_100': 25
+      'extreme_70': 20
+      'short_traffic': 5
+      'resource_70': 15
+      'resource_50': 15
+      'profile_10': 15
+      'extreme_50': 15
+
+    PROFILE_RUNNING_SEQ:
+      - 'profile_100'
+      - 'extreme_70'
+      - 'short_traffic'
+      - 'profile_10'
+      - 'profile_70'
+      - 'resource_50'
+      - 'profile_50'
+      - 'resource_70'
+      - 'extreme_50'
+      - 'profile_30'
+
+      # profile description:
+        # 'profile_100':	traffic active for 100% of running time defined in profile_running_time
+        # 'extreme_70':		traffic active time = 14s, and then idle_time = 6s
+        # 'short_traffic':	traffic active time random from 1s to 5s, and then idle_time = 3s
+        # 'profile_50':		traffic active time and idle time random, but total time of active traffic is 50% of running time defined in profile_running_time
+        # 'resource_70':	traffic active with less resource, around 70%. This profile has lower throughput and lower average TX power.
+        # 'profile_70':		traffic active time and idle time random, but total time of active traffic is 70% of running time defined in profile_running_time
+        # 'resource_50':	traffic active with less resource, around 50%. This profile has lower throughput and lower average TX power.
+        # 'profile_30':		traffic active time and idle time random, but total time of active traffic is 30% of running time defined in profile_running_time
+        # 'profile_10':		traffic active time and idle time random, but total time of active traffic is 10% of running time defined in profile_running_time
+
+
+##################################################
+####    UE lock config
+##################################################
+UE_AND_CELL_INFOS :
+    - cell_pci: 271
+      cell_ssb: 627648
+      ue_ip: 127.0.0.1
+      ue_port: 2203
+      ue_su_passwd: YOUR_SECRET
+    - cell_pci: 272
+      cell_ssb: 652992
+      ue_ip: 127.0.0.1
+      ue_port: 2204
+      ue_su_passwd: YOUR_SECRET
+
+
+##################################################
+####    UE call config
+##################################################
+AppServer1: &APP_SERVER_1                        # 1st application server definition
+   address: '127.0.0.1'                      # MANDATORY , [iperf server], [Need modification]
+   user: 'TEST_USER'                                 # MANDATORY , [iperf server user], [Need modification]
+   password: 'YOUR_SECRET'                     # MANDATORY , [iperf server password], [Need modification]
+   bind_interface_ip: '127.0.0.1'              # OPTIONAL, ip of interface used for data transfer
+   binary_path: '/usr/bin/iperf3'                  # OPTIONAL, binary path for data transfer - please use Unix like separators
+   ports:                                        # OPTIONAL, port range for data transfer, [named rule as gnb ID, 52201 for UL port, and 52211 for DL port], [Need modification]      
+        - 53801
+        - 53802
+        - 53803
+        - 53811
+        - 53812
+        - 53813
+
+UE_POOLS:
+    ExampleUePool:                                    # Ue Pool class defined by plugin library
+        inline_config:
+
+            EXAMPLE_UE_1:                                # UE name - [change if you want], [Need modification]
+                CAPABILITIES:                             # Capabilities that UE has. (as a list)
+                    - DDTT_UE_1
+                CLASS: ExampleUe
+                CONSTRUCTOR_PARAMETERS:                           # Parameters that will be passed to ExampleUe constructor when Ue instance is created.
+                    com_port: '22'                                 # MANDATORY, number of com port supporting AT commands, [Need modification]
+                    root_password: 'YOUR_SECRET'                 # MANDATORY, UE root password for 'su root', [Need modification]
+                    ue_manage_ip: '127.0.0.1'                   # MANDATORY, UE manage ip address (can be obtained via 'wmic nic' and 'netsh' command on the UE PC), [Need modification]
+                    serial_number: ''                             # OPTIONAL, UE serial number (can be obtained via 'adb devices')
+                    version: '3.2'                                # OPTIONAL, UE firmware version, [Need modification]
+                    configuration:
+                        ue_pc_address: '127.0.0.1'             # MANDATORY, UE PC domain address or IP, [Need modification]
+                        ue_pc_port: 6666                           # OPTIONAL, UE PC HTTP connection port, default is 80
+                        data_transfer:
+                            iperf:
+                                app_server: *APP_SERVER_1             # MANDATORY, Application Server configuration
+                                version: '3'                          # OPTIONAL, iperf version in data transfer, allowed values: 3 or 2 (set by default)
+                                binary_path: '/usr/bin/iperf3'        # OPTIONAL, UE shell binary location - please use Unix like separators
+                                bind_ue_ip: True
+
+
+            EXAMPLE_UE_2: # UE name - [change if you want], [Need modification]
+                CAPABILITIES: # Capabilities that UE has. (as a list)
+                  - DDTT_UE_2
+                CLASS: ExampleUe
+                CONSTRUCTOR_PARAMETERS: # Parameters that will be passed to ExampleUe constructor when Ue instance is created.
+                    com_port: '35'                                 # MANDATORY, number of com port supporting AT commands, [Need modification]
+                    root_password: 'YOUR_SECRET'                 # MANDATORY, UE root password for 'su root', [Need modification]
+                    ue_manage_ip: '127.0.0.1'                   # MANDATORY, UE manage ip address (can be obtained via 'wmic nic' and 'netsh' command on the UE PC), [Need modification]
+                    serial_number: ''                             # OPTIONAL, UE serial number (can be obtained via 'adb devices')
+                    version: '3.2'                                # OPTIONAL, UE firmware version, [Need modification]
+                    configuration:
+                      ue_pc_address: '127.0.0.1'             # MANDATORY, UE PC domain address or IP, [Need modification]
+                      ue_pc_port: 6666                           # OPTIONAL, UE PC HTTP connection port, default is 80
+                      data_transfer:
+                        iperf:
+                          app_server: *APP_SERVER_1             # MANDATORY, Application Server configuration
+                          version: '3'                          # OPTIONAL, iperf version in data transfer, allowed values: 3 or 2 (set by default)
+                          binary_path: '/usr/bin/iperf3'        # OPTIONAL, UE shell binary location - please use Unix like separators
+                          bind_ue_ip: True
+
+
+            EXAMPLE_UE_3: # UE name - [change if you want], [Need modification]
+              CAPABILITIES: # Capabilities that UE has. (as a list)
+                - DDTT_UE_test1
+                - DDTT_UE_test2
+              CLASS: ExampleUe
+              CONSTRUCTOR_PARAMETERS: # Parameters that will be passed to ExampleUe constructor when Ue instance is created.
+                com_port: '23'                                 # MANDATORY, number of com port supporting AT commands, [Need modification]
+                root_password: 'YOUR_SECRET'                 # MANDATORY, UE root password for 'su root', [Need modification]
+                ue_manage_ip: '127.0.0.1'                   # MANDATORY, UE manage ip address (can be obtained via 'wmic nic' and 'netsh' command on the UE PC), [Need modification]
+                serial_number: ''                             # OPTIONAL, UE serial number (can be obtained via 'adb devices')
+                version: '3.2'                                # OPTIONAL, UE firmware version, [Need modification]
+                configuration:
+                  ue_pc_address: '127.0.0.1'             # MANDATORY, UE PC domain address or IP, [Need modification]
+                  ue_pc_port: 6666                           # OPTIONAL, UE PC HTTP connection port, default is 80
+                  data_transfer:
+                    iperf:
+                      app_server: *APP_SERVER_1             # MANDATORY, Application Server configuration
+                      version: '3'                          # OPTIONAL, iperf version in data transfer, allowed values: 3 or 2 (set by default)
+                      binary_path: '/usr/bin/iperf3'        # OPTIONAL, UE shell binary location - please use Unix like separators
+                      bind_ue_ip: True
